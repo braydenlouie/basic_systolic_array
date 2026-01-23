@@ -1,0 +1,22 @@
+# Vivado junk
+*.jou
+*.log
+*.str
+*.os
+*.pb
+vivado*
+
+# Project-specific artifacts
+.Xil/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.srcs/utils_1/
+*.gen/
+
+# Output files
+*.bit
+*.bin
+*.mcs
