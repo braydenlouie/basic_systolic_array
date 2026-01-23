@@ -1,22 +1,28 @@
-# Vivado junk
-*.jou
+# Vivado Project & Temp Files
+build/
+work/
+.Xil/
 *.log
+*.jou
 *.str
 *.os
+vivado*.backup.tcl
+
+# Compilation & Simulation
 *.pb
-vivado*
+*.dir/
+*.wdb
+xsim.dir/
+xvlog.pb
+xelab.pb
 
-# Project-specific artifacts
-.Xil/
-*.cache/
-*.hw/
-*.ip_user_files/
-*.runs/
-*.sim/
-*.srcs/utils_1/
-*.gen/
-
-# Output files
+# Hardware Artifacts
 *.bit
 *.bin
 *.mcs
+*.prm
+*.xsa
+
+# System Junk
+.DS_Store
+.vscode/
