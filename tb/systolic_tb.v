@@ -21,7 +21,8 @@ module systolic_tb;
     initial begin
         clk = 0;
         reset = 1;
-        in_top, in_left = 0;
+        in_top = 0;
+        in_left = 0;
 
         // test array
         // in_left: rows of 1's, 2's, 3's, 4's
@@ -62,6 +63,6 @@ module systolic_tb;
         #80 reset = 0;
 
         #20
-        
-     end
+        $finish;
+    end
 endmodule
