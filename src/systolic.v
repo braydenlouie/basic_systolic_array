@@ -5,9 +5,8 @@ module systolic#(
     parameter DATA_WIDTH = 4
 )(
     input clk, reset,
-    input [ARRAY_SIZE * DATA_WIDTH - 1 : 0] input_left, input_top,
-    output [ARRAY_SIZE * (DATA_WIDTH * DATA_WIDTH) - 1 : 0] output_bot,
-    output done
+    input signed [ARRAY_SIZE * DATA_WIDTH - 1 : 0] input_left, input_top,
+    output signed [ARRAY_SIZE * (DATA_WIDTH * DATA_WIDTH) - 1 : 0] output_bot
 );
 
     parameter NUM_WIRES = ARRAY_SIZE * (ARRAY_SIZE + 1);

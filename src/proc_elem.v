@@ -4,10 +4,10 @@ module proc_elem#(
     parameter DATA_WIDTH = 4
 )(
     input clk, reset,
-    input [DATA_WIDTH - 1 : 0] in_left, in_top,
-    input [DATA_WIDTH * DATA_WIDTH - 1 : 0] in_sum,
-    output reg [DATA_WIDTH - 1 : 0] out_right, out_bot, 
-    output reg [DATA_WIDTH * DATA_WIDTH - 1 : 0] out_sum
+    input signed [DATA_WIDTH - 1 : 0] in_left, in_top,
+    input signed [DATA_WIDTH * DATA_WIDTH - 1 : 0] in_sum,
+    output reg signed [DATA_WIDTH - 1 : 0] out_right, out_bot, 
+    output reg signed [DATA_WIDTH * DATA_WIDTH - 1 : 0] out_sum
 );
     
     wire [DATA_WIDTH * 2 - 1 : 0] product;
