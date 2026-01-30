@@ -3,7 +3,7 @@
 module proc_elem#(
     parameter DATA_WIDTH = 4
 )(
-    input clk, reset, load
+    input clk, reset, load,
     input signed [DATA_WIDTH - 1 : 0] in_val, in_weight,
     input signed [DATA_WIDTH * DATA_WIDTH - 1 : 0] in_sum,
     output reg signed [DATA_WIDTH - 1 : 0] out_val, out_weight, 
@@ -11,7 +11,7 @@ module proc_elem#(
 );
     
     wire [DATA_WIDTH * 2 - 1 : 0] product;
-    reg [DATA-WIDTH * 2 - 1 : 0] weight;
+    reg [DATA_WIDTH * 2 - 1 : 0] weight;
     
     assign product = in_val * weight;
     always @(posedge clk, posedge reset) begin
@@ -25,7 +25,7 @@ module proc_elem#(
             out_weight <= weight;
         end
         else begin
-            out_sum <= product + in_sum
+            out_sum <= product + in_sum;
         end
     end
             

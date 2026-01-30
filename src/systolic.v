@@ -5,8 +5,8 @@ module systolic#(
     parameter DATA_WIDTH = 4
 )(
     input clk, reset, load,
-    input signed [ARRAY_SIZE * DATA_WIDTH - 1 : 0] matrix_vals, weight_matrix,
-    output signed [ARRAY_SIZE * (DATA_WIDTH * DATA_WIDTH) - 1 : 0] output
+    input signed [ARRAY_SIZE * DATA_WIDTH - 1 : 0] activations, weights,
+    output signed [ARRAY_SIZE * (DATA_WIDTH * DATA_WIDTH) - 1 : 0] output_row
 );
 
     parameter NUM_WIRES = ARRAY_SIZE * (ARRAY_SIZE + 1);
@@ -17,7 +17,7 @@ module systolic#(
     // internal buses
     // hor_bus: carrying input data from left to right 
     // ver_bus: carrying input data from top to bottom
-    wire [NUM_WIRES * DATA_WIDTH - 1 : 0] val_bus, weight_bus;
+    wire [NUM_WIRES * DATA_WIDTH - 1 : 0] act_bus, weight_bus;
 
     // sum_bus: carrying sum data from top to bottom
     wire [NUM_WIRES * SUM_DATA_WIDTH - 1 : 0] sum_bus;
@@ -27,8 +27,8 @@ module systolic#(
     genvar b;
     generate
         for (b = 0; b < ARRAY_SIZE; b = b + 1) begin
-            assign val_bus[(b * SEGMENTS_PER_LINE) * DATA_WIDTH +: DATA_WIDTH] = matrix_vals[b * DATA_WIDTH +: DATA_WIDTH];
-            assign weight_bus[(b * SEGMENTS_PER_LINE) * DATA_WIDTH +: DATA_WIDTH] = weight_matrix[b * DATA_WIDTH +: DATA_WIDTH];
+            assign act_bus[(b * SEGMENTS_PER_LINE) * DATA_WIDTH +: DATA_WIDTH] = activations[b * DATA_WIDTH +: DATA_WIDTH];
+            assign weight_bus[(b * SEGMENTS_PER_LINE) * DATA_WIDTH +: DATA_WIDTH] =weights[b * DATA_WIDTH +: DATA_WIDTH];
             assign sum_bus[(b * SEGMENTS_PER_LINE) * SUM_DATA_WIDTH +: SUM_DATA_WIDTH] = {SUM_DATA_WIDTH{1'b0}};
         end
     endgenerate
@@ -37,17 +37,17 @@ module systolic#(
     generate
         for (r = 0; r < ARRAY_SIZE; r = r + 1) begin
             for (c = 0; c < ARRAY_SIZE; c = c + 1) begin
-                proc_elem #(.DATA_WIDTH(DATA_WIDTH)) {
+                proc_elem #(.DATA_WIDTH(DATA_WIDTH)) (
                     .clk(clk),
                     .reset(reset),
                     .load(load),
-                    .in_val(val_bus[(c * SEGMENTS_PER_LINE + r) * DATA_WIDTH - 1 +: DATA_WIDTH]),
-                    .out_val(val_bus[((c + 1) * SEGMENTS_PER_LINE + r) * DATA_WIDTH - 1 +: DATA_WIDTH]),
+                    .in_val(act_bus[(c * SEGMENTS_PER_LINE + r) * DATA_WIDTH - 1 +: DATA_WIDTH]),
+                    .out_val(act_bus[((c + 1) * SEGMENTS_PER_LINE + r) * DATA_WIDTH - 1 +: DATA_WIDTH]),
                     .in_weight(weight_bus[(r * SEGMENTS_PER_LINE + c) * DATA_WIDTH - 1 +: DATA_WIDTH]),
                     .out_weight(weight_bus[((r + 1) * SEGMENTS_PER_LINE + c) * DATA_WIDTH - 1 +: DATA_WIDTH]),
                     .in_sum(sum_bus[((r + 1) * SEGMENTS_PER_LINE + c) * SUM_DATA_WIDTH - 1 +: SUM_DATA_WIDTH]),
                     .out_sum(sum_bus[((r + 1) * SEGMENTS_PER_LINE + c) * SUM_DATA_WIDTH - 1 +: SUM_DATA_WIDTH])
-                }
+                );
             end
         end
     endgenerate
@@ -56,7 +56,8 @@ module systolic#(
     generate
         for (i = 0; i < ARRAY_SIZE; i = i + 1) begin 
             // assign output which is extra row at the bottom 
-            assign output [i * SUM_DATA_WIDTH +: SUM_DATA_WIDTH] = sum_bus[(ARRAY_SIZE * SEGMENTS_PER_LINE + i) * SUM_DATA_WIDTH +: SUM_DATA_WIDTH];
+            assign output_row [i * SUM_DATA_WIDTH +: SUM_DATA_WIDTH] = 
+                sum_bus[(ARRAY_SIZE * SEGMENTS_PER_LINE + i) * SUM_DATA_WIDTH +: SUM_DATA_WIDTH];
         end
     endgenerate
     
