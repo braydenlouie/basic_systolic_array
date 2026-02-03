@@ -16,16 +16,17 @@ module proc_elem#(
     assign product = in_val * weight;
     always @(posedge clk, posedge reset) begin
         if (reset == 1) begin
-            weight <= 0;
-            out_weight <= 0;
-            out_sum <= 0;
-            out_val <= 0;
+            weight = 0;
+            out_weight = 0;
+            out_sum = 0;
+            out_val = 0;
         end
         else begin
-            out_sum <= product + in_sum;
+            out_sum = product + in_sum;
             out_val <= in_val;
             if (load == 1) begin
-                weight <= in_weight;
+                //weights are loaded immediately, blocking assignment
+                weight = in_weight; 
                 out_weight <= weight;
             end
         end

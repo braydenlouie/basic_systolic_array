@@ -1,20 +1,17 @@
 `timescale 1ns / 1ps
 
 module systolic#(
-    parameter ARRAY_SIZE = 4,
+    parameter ARRAY_SIZE = 8,
     parameter DATA_WIDTH = 4
 )(
     input clk, reset, load,
     input signed [ARRAY_SIZE * DATA_WIDTH - 1 : 0] activations, weights,
-
-    output signed [ARRAY_SIZE * (ARRAY_SIZE + 1) * DATA_WIDTH - 1 : 0] act_tb, weight_tb,
-    output signed [ARRAY_SIZE * (ARRAY_SIZE + 1) * DATA_WIDTH * DATA_WIDTH - 1 : 0] sum_tb,
     output signed [ARRAY_SIZE * (DATA_WIDTH * DATA_WIDTH) - 1 : 0] output_row
 );
 
     parameter NUM_WIRES = ARRAY_SIZE * (ARRAY_SIZE + 1);
     parameter ROW_COL_WIDTH = ARRAY_SIZE * DATA_WIDTH;
-    parameter SUM_DATA_WIDTH = DATA_WIDTH * DATA_WIDTH;
+    parameter SUM_DATA_WIDTH = DATA_WIDTH * DATA_WIDTH; // honestly overkill
     parameter BUS_SEGMENTS = ARRAY_SIZE + 1; // 1 extra for output
 
     // internal buses
@@ -31,14 +28,13 @@ module systolic#(
     assign act_tb = act_bus;
     assign weight_tb = weight_bus;
     assign sum_tb = sum_bus;
-    genvar b;
-    generate
-        for (b = 0; b < ARRAY_SIZE; b = b + 1) begin
-            assign act_bus[b * DATA_WIDTH +: DATA_WIDTH] = activations[b * DATA_WIDTH +: DATA_WIDTH];
-            assign weight_bus[b * DATA_WIDTH +: DATA_WIDTH] = weights[b * DATA_WIDTH +: DATA_WIDTH];
-            assign sum_bus[b * SUM_DATA_WIDTH +: SUM_DATA_WIDTH] = {SUM_DATA_WIDTH{1'b0}};
-        end
-    endgenerate
+
+    // feeding values to activations and weight buses
+    assign act_bus[ARRAY_SIZE * DATA_WIDTH - 1 : 0] = activations;
+    assign weight_bus[ARRAY_SIZE * DATA_WIDTH - 1 : 0] = weights;
+
+    // feeding 0's into first set of PE's
+    assign sum_bus[ARRAY_SIZE * SUM_DATA_WIDTH - 1 : 0] = 0;
 
     genvar r, c; // used in for loops for row and col
     generate
@@ -59,14 +55,8 @@ module systolic#(
         end
     endgenerate
 
-    genvar i; // used in for loop for assigning output
-    generate
-        for (i = 0; i < ARRAY_SIZE; i = i + 1) begin 
-            // assign output which is extra row at the bottom 
-            assign output_row [i * SUM_DATA_WIDTH +: SUM_DATA_WIDTH] = 
-                sum_bus[(ARRAY_SIZE * BUS_SEGMENTS + i) * SUM_DATA_WIDTH +: SUM_DATA_WIDTH];
-        end
-    endgenerate
+    // output row is "last row" in sum
+    assign output_row = sum_bus[ARRAY_SIZE * ARRAY_SIZE * SUM_DATA_WIDTH +: ARRAY_SIZE * SUM_DATA_WIDTH];
 
     
 endmodule

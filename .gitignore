@@ -26,3 +26,8 @@ xelab.pb
 # System Junk
 .DS_Store
 .vscode/
+
+# For Mac/Linux Simulations
+mac_sim/
+*.vvp
+*.vcd
