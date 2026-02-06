@@ -25,10 +25,6 @@ module systolic#(
     // assigning first row/col of horizontal and vertical to inputs
     // assigns first col of sum_bus to 0's
 
-    assign act_tb = act_bus;
-    assign weight_tb = weight_bus;
-    assign sum_tb = sum_bus;
-
     // feeding values to activations and weight buses
     assign act_bus[ARRAY_SIZE * DATA_WIDTH - 1 : 0] = activations;
     assign weight_bus[ARRAY_SIZE * DATA_WIDTH - 1 : 0] = weights;
